@@ -1,9 +1,24 @@
+/* Load processing's video stuff
+------------------------------------------------------------ */
+
 import processing.video.*;
 Capture myCapture;
 
-PImage btnDraw;
-PImage btnSave;
-PImage btnTrash;
+/* Global variables
+------------------------------------------------------------ */
+
+// Size of the vido capture
+int captureW;
+int captureH;
+
+// UI dimensions, position, misc.
+int uiW;
+int uiH;
+int uiX;
+int uiY;
+int uiButtonOffsetY;
+
+// Colors
 int colorsX;  
 int colorsY;
 int colorBlock;
@@ -18,27 +33,29 @@ color cBlonde;
 color cBrown;
 color cRed;
 color[] colors;
-PImage sImage;
-float baseStart;
-float baseLength;
-float xVector;
-float yVector;
-float hStart;
-float hLength;
+
+// Utilities
 float m;
 boolean newbeard;
 String mode;
 
+/* Set 'er up
+------------------------------------------------------------ */
+
 void setup() {
-  size(320, 284);
-  background(72, 63, 51); 
-  myCapture = new Capture(this, 320, 240, 30);
-  myCapture.crop(0, 0, 320, 240); // So grainy pixels don't bleed.
-  btnDraw = loadImage("btn-draw.png");
-  btnSave = loadImage("btn-save.png");
-  btnTrash = loadImage("btn-trash.png");
+  captureW = 640;
+  captureH = 480;
+  uiW = captureW;
+  uiH = 44;
+  uiX = 0;
+  uiY = captureH;
+  uiButtonOffsetY = 9;
+  size(captureW, captureH+uiH);
+  background(0, 0, 0);
+  myCapture = new Capture(this, captureW, captureH, 30);
+  myCapture.crop(0, 0, captureW, captureH); // So grainy pixels don't bleed.  
   colorsX = 119;  
-  colorsY = 242;
+  colorsY = captureH+2;
   colorBlock = 14;
   colorBlockOffsetX = 6;
   colorBlockOffsetY = 8;    
@@ -55,41 +72,54 @@ void setup() {
   colors[1] = cWhite;
   colors[2] = cBlonde;
   colors[3] = cBrown;
-  colors[4] = cRed;  
-  baseStart = 3;
-  baseLength = 10;  
+  colors[4] = cRed;   
   newbeard = true;
   mode = "pose";
 }
+
+/* Fire up the video feed
+------------------------------------------------------------ */
 
 void captureEvent(Capture myCapture) {
   myCapture.read();
 }
 
+/* Keyboard UI
+------------------------------------------------------------ */
+
 void keyPressed() {
+  
   // Draw Key
-  if (key == 'b') { 
+  if (key == 'd') { 
     image(myCapture, 0, 0);
     newbeard = false;
     mode = "draw";
   }
+  
   // Save Key
   if (key == 's') {    
-    sImage = get(0, 0, 320, 240);
-    sImage.save("beard-" + m + ".png");
+    saveImage(m);
   }
+  
   // Trash Key
   if (key == 'n') {
     newbeard = true;
     mode = "pose";
   }
+  
 }
+
+/* Mouse UI
+------------------------------------------------------------ */
 
 void mousePressed() {
   
+  int uiButtonsYMin = uiY+uiButtonOffsetY;
+  int uiButtonsYMax = uiY+uiButtonOffsetY+25; // Buttons are 25x25.
+  
   if (mode == "pose") {
     // Draw Button
-    if (mouseX >= 148 && mouseX <= 173 && mouseY >= 249 && mouseY <= 274) {
+    if (mouseX >= 148 && mouseX <= 173 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
       image(myCapture, 0, 0);
       newbeard = false;    
       mode = "draw";
@@ -98,12 +128,11 @@ void mousePressed() {
   
   if (mode == "draw") {
     // Save Button
-    if (mouseX >= 82 && mouseX <= 107 && mouseY >= 249 && mouseY <= 274) {
-      sImage = get(0, 0, 320, 240);
-      sImage.save("beard-" + m + ".png");     
+    if (mouseX >= 82 && mouseX <= 107 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+      saveImage(m);  
     }  
     // Trash Button
-    if (mouseX >= 213 && mouseX <= 238 && mouseY >= 249 && mouseY <= 274) {
+    if (mouseX >= 213 && mouseX <= 238 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
       newbeard = true;
       mode = "pose";
     }
@@ -136,11 +165,19 @@ void mousePressed() {
   } 
 }
 
+/* Draw
+------------------------------------------------------------ */
+
 void draw() {
+  // Whiskers
+  float baseStart = 3;
+  float baseLength = 10;  
+  float hStart = random(-baseStart, baseStart);
+  float hLength = random(baseLength); 
+  float xVector;
+  float yVector;
+ 
   m = millis();
-  
-  hStart = random(-baseStart, baseStart);
-  hLength = random(baseLength);
   
   if (newbeard == true) {
     image(myCapture, 0, 0); 
@@ -167,37 +204,22 @@ void draw() {
   }
   
   // UI
-  noSmooth();
-  strokeWeight(1);
-  stroke(44, 38, 29);
-  line(0, 240, 320, 240);
-  stroke(59, 51, 41);
-  line(0, 241, 320, 241);
-  stroke(67, 58, 47);
-  line(0, 242, 320, 242);
-  noStroke();
-  fill(72, 63, 51); // BG
-  rect(0, 243, 320, 39);
-  stroke(67, 58, 47);
-  line(0, 282, 320, 282);
-  stroke(59, 51, 41);
-  line(0, 283, 320, 283);
+  renderUIBackground();
 
-  
   if (mode == "pose") {
     
-    // Draw Button
-    image(btnDraw, 148, 249); 
+    // Show Draw Button
+    renderUIButton("btn-draw.png", 148, 489); //offset +9 vertical
     
   }
   
   if (mode == "draw") {
     
-    /// Save Button
-    image(btnSave, 82, 249);
+    // Show Save Button
+    renderUIButton("btn-save.png", 82, 489); //offset +9 vertical
     
-    // Delete Button
-    image(btnTrash, 213, 249);
+    // Show Delete Button
+    renderUIButton("btn-trash.png", 213, 489); //offset +9 vertical
   
     // Color Buttons
     // Button Background
@@ -216,4 +238,28 @@ void draw() {
     }
     
   }
+}
+
+/* Utility functions
+------------------------------------------------------------ */
+
+// Render the UI background
+void renderUIBackground() {
+  noStroke();
+  fill(72, 63, 51); // BG
+  rect(uiX, uiY, uiW, uiH);
+}
+
+// Render a UI button
+void renderUIButton(String btnFile, int btnX, int btnY) {
+  PImage btnNew; 
+  btnNew = loadImage(btnFile);
+  image(btnNew, btnX, btnY);
+}
+
+// Save an image
+void saveImage(float stamp) {
+  PImage sImage;
+  sImage = get(0, 0, captureW, captureH);
+  sImage.save("beard-" + stamp + ".png");  
 }
