@@ -8,15 +8,15 @@ Capture myCapture;
 ------------------------------------------------------------ */
 
 // Size of the vido capture
-int captureW;
-int captureH;
+int captureW = 640;
+int captureH = 480;
 
-// UI dimensions, position, misc.
-int uiW;
-int uiH;
-int uiX;
-int uiY;
-int uiButtonOffsetY;
+// UI dimensions, positions
+int uiW = captureW;
+int uiH = 44;
+int uiX = 0;
+int uiY = captureH;
+int uiButtonOffsetY = 9;
 
 // Colors
 int colorsX;  
@@ -35,7 +35,6 @@ color cRed;
 color[] colors;
 
 // Utilities
-float m;
 boolean newbeard;
 String mode;
 
@@ -43,17 +42,12 @@ String mode;
 ------------------------------------------------------------ */
 
 void setup() {
-  captureW = 640;
-  captureH = 480;
-  uiW = captureW;
-  uiH = 44;
-  uiX = 0;
-  uiY = captureH;
-  uiButtonOffsetY = 9;
   size(captureW, captureH+uiH);
   background(0, 0, 0);
+  
   myCapture = new Capture(this, captureW, captureH, 30);
-  myCapture.crop(0, 0, captureW, captureH); // So grainy pixels don't bleed.  
+  myCapture.crop(0, 0, captureW, captureH); // So grainy pixels don't bleed. 
+  
   colorsX = 119;  
   colorsY = captureH+2;
   colorBlock = 14;
@@ -72,7 +66,8 @@ void setup() {
   colors[1] = cWhite;
   colors[2] = cBlonde;
   colors[3] = cBrown;
-  colors[4] = cRed;   
+  colors[4] = cRed;  
+  
   newbeard = true;
   mode = "pose";
 }
@@ -98,7 +93,7 @@ void keyPressed() {
   
   // Save Key
   if (key == 's') {    
-    saveImage(m);
+    saveImage();
   }
   
   // Trash Key
@@ -129,7 +124,7 @@ void mousePressed() {
   if (mode == "draw") {
     // Save Button
     if (mouseX >= 82 && mouseX <= 107 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-      saveImage(m);  
+      saveImage();  
     }  
     // Trash Button
     if (mouseX >= 213 && mouseX <= 238 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
@@ -176,13 +171,13 @@ void draw() {
   float hLength = random(baseLength); 
   float xVector;
   float yVector;
- 
-  m = millis();
   
+  // Clear out pose
   if (newbeard == true) {
     image(myCapture, 0, 0); 
   }
   
+  // Draw whiskers
   if (mousePressed == true) {
     
     if (mouseX>=width/2) {
@@ -201,6 +196,7 @@ void draw() {
     strokeWeight(1);
     smooth();
     line(mouseX+hStart, mouseY+hStart, mouseX+xVector, mouseY+yVector);   
+    
   }
   
   // UI
@@ -258,8 +254,15 @@ void renderUIButton(String btnFile, int btnX, int btnY) {
 }
 
 // Save an image
-void saveImage(float stamp) {
+void saveImage() {
   PImage sImage;
   sImage = get(0, 0, captureW, captureH);
-  sImage.save("beard-" + stamp + ".png");  
+  sImage.save("beard-" + timestamp() + ".png");  
 }
+
+// Create a timestamp
+String timestamp() {
+  Calendar now = Calendar.getInstance();
+  return String.format("%1$ty%1$tm%1$td_%1$tH%1$tM%1$tS%1$tL", now);
+}
+
