@@ -7,6 +7,9 @@ Capture myCapture;
 /* Global variables
 ------------------------------------------------------------ */
 
+// Image buttons
+ImageButtons btnDraw, btnSave, btnTrash;
+
 // Size of the vido capture
 int captureW = 640;
 int captureH = 480;
@@ -48,6 +51,13 @@ void setup() {
   myCapture = new Capture(this, captureW, captureH, 30);
   myCapture.crop(0, 0, captureW, captureH); // So grainy pixels don't bleed. 
   
+  PImage btnDrawSrc = loadImage("btn-draw.png");
+  btnDraw = new ImageButtons(0, 480, btnDrawSrc.width, btnDrawSrc.height, btnDrawSrc);
+  PImage btnSaveSrc = loadImage("btn-save.png");
+  btnSave = new ImageButtons(30, 480, btnSaveSrc.width, btnSaveSrc.height, btnSaveSrc);  
+  PImage btnTrashSrc = loadImage("btn-trash.png");
+  btnTrash = new ImageButtons(60, 480, btnTrashSrc.width, btnTrashSrc.height, btnTrashSrc);  
+  
   colorsX = 119;  
   colorsY = captureH+2;
   colorBlock = 14;
@@ -86,9 +96,7 @@ void keyPressed() {
   
   // Draw Key
   if (key == 'd') { 
-    image(myCapture, 0, 0);
-    newbeard = false;
-    mode = "draw";
+    newDrawing();
   }
   
   // Save Key
@@ -112,25 +120,25 @@ void mousePressed() {
   int uiButtonsYMin = uiY+uiButtonOffsetY;
   int uiButtonsYMax = uiY+uiButtonOffsetY+25; // Buttons are 25x25.
   
-  if (mode == "pose") {
-    // Draw Button
-    if (mouseX >= 148 && mouseX <= 173 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-      image(myCapture, 0, 0);
-      newbeard = false;    
-      mode = "draw";
-    }
-  } 
+//  if (mode == "pose") {
+//    // Draw Button
+//    if (mouseX >= 148 && mouseX <= 173 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+//      image(myCapture, 0, 0);
+//      newbeard = false;    
+//      mode = "draw";
+//    }
+//  } 
   
   if (mode == "draw") {
     // Save Button
-    if (mouseX >= 82 && mouseX <= 107 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-      saveImage();  
-    }  
+//    if (mouseX >= 82 && mouseX <= 107 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+//      saveImage();  
+//    }  
     // Trash Button
-    if (mouseX >= 213 && mouseX <= 238 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-      newbeard = true;
-      mode = "pose";
-    }
+//    if (mouseX >= 213 && mouseX <= 238 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+//      newbeard = true;
+//      mode = "pose";
+//    }
     // Colors    
     // Black
     if (mouseX >= colorsX+colorBlockOffsetX && mouseX <= colorsX+colorBlockOffsetX+colorBlock && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
@@ -164,6 +172,7 @@ void mousePressed() {
 ------------------------------------------------------------ */
 
 void draw() {
+ 
   // Whiskers
   float baseStart = 3;
   float baseLength = 10;  
@@ -201,21 +210,28 @@ void draw() {
   
   // UI
   renderUIBackground();
+  
+  update(mouseX, mouseY);
 
   if (mode == "pose") {
     
     // Show Draw Button
-    renderUIButton("btn-draw.png", 148, 489); //offset +9 vertical
+    btnDraw.update();
+    btnDraw.display(); 
     
   }
   
   if (mode == "draw") {
     
     // Show Save Button
-    renderUIButton("btn-save.png", 82, 489); //offset +9 vertical
+    //renderUIButton("btn-save.png", 82, 489); //offset +9 vertical
+    btnSave.update();
+    btnSave.display();
     
     // Show Delete Button
-    renderUIButton("btn-trash.png", 213, 489); //offset +9 vertical
+    //renderUIButton("btn-trash.png", 213, 489); //offset +9 vertical
+    btnTrash.update();
+    btnTrash.display();
   
     // Color Buttons
     // Button Background
@@ -234,7 +250,120 @@ void draw() {
     }
     
   }
+  
+  
+  
+ 
 }
+
+
+void update(int x, int y) {
+  if (mousePressed) {
+    
+    if (btnDraw.pressed && mode == "pose") {
+      newDrawing();
+    }
+
+    if (btnSave.pressed && mode == "draw") {
+      saveImage();
+    }
+    
+    if (btnTrash.pressed && mode == "draw") {
+      trashDrawing();
+    }
+  }
+}
+
+void newDrawing() {
+  image(myCapture, 0, 0);
+  newbeard = false;
+  mode = "draw";
+}
+
+void trashDrawing() {
+  newbeard = true;
+  mode = "pose";
+}  
+
+/* Classes
+------------------------------------------------------------ */
+
+class Button
+{
+  int x, y;
+  int w, h;
+  color basecolor, highlightcolor;
+  color currentcolor;
+  boolean over = false;
+  boolean pressed = false;   
+  
+  void pressed() {
+    if(over && mousePressed) {
+      pressed = true;
+    } else {
+      pressed = false;
+    }    
+  }
+  
+  boolean overRect(int x, int y, int width, int height) {
+    if (mouseX >= x && mouseX <= x+width && mouseY >= y && mouseY <= y+height) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+class ImageButtons extends Button 
+{
+  PImage base;
+  //PImage roll;
+  //PImage down;
+  PImage currentimage;
+
+  ImageButtons(int ix, int iy, int iw, int ih, PImage ibase) //  PImage iroll, PImage idown
+  {
+    x = ix;
+    y = iy;
+    w = iw;
+    h = ih;
+    base = ibase;
+    //roll = iroll;
+    //down = idown;
+    currentimage = base;
+  }
+  
+  void update() 
+  {
+    over();
+    pressed();
+    /*
+    if(pressed) {
+      //currentimage = down;
+    } else if (over){
+      //currentimage = roll;
+    } else {
+    */
+      currentimage = base;
+    /*
+    }*/
+  }
+  
+  void over() 
+  {
+    if( overRect(x, y, w, h) ) {
+      over = true;
+    } else {
+      over = false;
+    }
+  }
+  
+  void display() 
+  {
+    image(currentimage, x, y);
+  }
+}
+
 
 /* Utility functions
 ------------------------------------------------------------ */
@@ -247,11 +376,11 @@ void renderUIBackground() {
 }
 
 // Render a UI button
-void renderUIButton(String btnFile, int btnX, int btnY) {
-  PImage btnNew; 
-  btnNew = loadImage(btnFile);
-  image(btnNew, btnX, btnY);
-}
+//void renderUIButton(String btnFile, int btnX, int btnY) {
+//  PImage btnNew; 
+//  btnNew = loadImage(btnFile);
+//  image(btnNew, btnX, btnY);
+//}
 
 // Save an image
 void saveImage() {
