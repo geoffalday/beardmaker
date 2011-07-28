@@ -14,11 +14,12 @@ ImageButton btnDraw, btnSave, btnTrash;
 // Colors
 color cCurrent, cBlack, cWhite, cBlonde, cBrown, cRed;
 
-// Size of the video capture
+// Capture dimensions
 int captureW = 640;
 int captureH = 480;
 
-// UI dimensions, positions
+// UI dimensions
+int uiW = captureW;
 int uiH = 44;
 
 // Utilities
@@ -46,10 +47,11 @@ void setup() {
   btnTrash = new ImageButton(68, 488, btnTrashSrc.width, btnTrashSrc.height, btnTrashSrc, btnTrashOverSrc);
      
   cBlack = color(0);
-  cWhite = color(255);
-  cBlonde = color(196, 189, 168);
-  cBrown = color(114, 72, 20);
-  cRed = color(123, 38, 24); 
+//  TODO: Add colors to UI.
+//  cWhite = color(255);
+//  cBlonde = color(196, 189, 168);
+//  cBrown = color(114, 72, 20);
+//  cRed = color(123, 38, 24); 
   cCurrent = cBlack;
 
   newbeard = true;
@@ -154,7 +156,6 @@ class Button
 {
   int x, y;
   int w, h;
-  int size;
   color basecolor, highlightcolor;
   color currentcolor;
   boolean over = false;
@@ -227,8 +228,8 @@ class ImageButton extends Button
 // Render the UI background
 void renderUIBackground() {
   noStroke();
-  fill(72, 63, 51); // BG
-  rect(0, 480, 650, 44);
+  fill(72, 63, 51);
+  rect(0, captureH, uiW, uiH);
 }
 
 // Create a new drawing
