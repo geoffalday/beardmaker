@@ -67,7 +67,7 @@ void captureEvent(Capture myCapture) {
 
 void keyPressed() {
   // Draw Key
-  if (key == 'n') { 
+  if (key == 'd') { 
     newDrawing();
   }
   // Save Key
