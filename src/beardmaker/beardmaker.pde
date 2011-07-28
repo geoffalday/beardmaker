@@ -76,7 +76,7 @@ void keyPressed() {
   }
   // Trash Key
   if (key == 't') {
-    newbeard = true;
+    trashDrawing();
   }
 }
 
