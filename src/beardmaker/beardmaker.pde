@@ -1,11 +1,15 @@
+/* Libraries
+------------------------------------------------------------ */
 import processing.video.*;
-Capture myCapture;
 
 /* Global variables
 ------------------------------------------------------------ */
 
+// Video 
+Capture myCapture;
+
 // Buttons
-ImageButtons btnDraw, btnSave, btnTrash;
+ImageButton btnDraw, btnSave, btnTrash;
 
 // Colors
 color cCurrent, cBlack, cWhite, cBlonde, cBrown, cRed;
@@ -19,6 +23,9 @@ int uiH = 44;
 
 // Utilities
 boolean newbeard;
+
+/* Setup
+------------------------------------------------------------ */
 
 void setup() {
   size(captureW, captureH+uiH);
@@ -34,9 +41,9 @@ void setup() {
   PImage btnTrashSrc = loadImage("btn-trash.png");
   PImage btnTrashOverSrc = loadImage("btn-trash-over.png");
   
-  btnDraw = new ImageButtons(8, 488, btnDrawSrc.width, btnDrawSrc.height, btnDrawSrc, btnDrawOverSrc);
-  btnSave = new ImageButtons(38, 488, btnSaveSrc.width, btnSaveSrc.height, btnSaveSrc, btnSaveOverSrc);  
-  btnTrash = new ImageButtons(68, 488, btnTrashSrc.width, btnTrashSrc.height, btnTrashSrc, btnTrashOverSrc);
+  btnDraw = new ImageButton(8, 488, btnDrawSrc.width, btnDrawSrc.height, btnDrawSrc, btnDrawOverSrc);
+  btnSave = new ImageButton(38, 488, btnSaveSrc.width, btnSaveSrc.height, btnSaveSrc, btnSaveOverSrc);  
+  btnTrash = new ImageButton(68, 488, btnTrashSrc.width, btnTrashSrc.height, btnTrashSrc, btnTrashOverSrc);
      
   cBlack = color(0);
   cWhite = color(255);
@@ -48,9 +55,15 @@ void setup() {
   newbeard = true;
 }
 
+/* Prep video
+------------------------------------------------------------ */
+
 void captureEvent(Capture myCapture) {
   myCapture.read();
 }
+
+/* Keyboard shortcuts
+------------------------------------------------------------ */
 
 void keyPressed() {
   // Draw Key
@@ -136,6 +149,7 @@ void draw() {
 /* Classes
 ------------------------------------------------------------ */
 
+// Base button class
 class Button
 {
   int x, y;
@@ -163,13 +177,14 @@ class Button
   }
 }
 
-class ImageButtons extends Button 
+// Image button class
+class ImageButton extends Button 
 {
   PImage base;
   PImage roll;
   PImage currentimage;
 
-  ImageButtons(int ix, int iy, int iw, int ih, PImage ibase, PImage iroll)
+  ImageButton(int ix, int iy, int iw, int ih, PImage ibase, PImage iroll)
   {
     x = ix;
     y = iy;
