@@ -10,16 +10,12 @@ Capture myCapture;
 // Image buttons
 ImageButtons btnDraw, btnSave, btnTrash;
 
-// Size of the vido capture
+// Size of the video capture
 int captureW = 640;
 int captureH = 480;
 
 // UI dimensions, positions
-int uiW = captureW;
 int uiH = 44;
-int uiX = 0;
-int uiY = captureH;
-int uiButtonOffsetY = 9;
 
 // Colors
 int colorsX;  
@@ -52,11 +48,15 @@ void setup() {
   myCapture.crop(0, 0, captureW, captureH); // So grainy pixels don't bleed. 
   
   PImage btnDrawSrc = loadImage("btn-draw.png");
-  btnDraw = new ImageButtons(0, 480, btnDrawSrc.width, btnDrawSrc.height, btnDrawSrc);
+  PImage btnDrawOverSrc = loadImage("btn-draw-over.png");
   PImage btnSaveSrc = loadImage("btn-save.png");
-  btnSave = new ImageButtons(30, 480, btnSaveSrc.width, btnSaveSrc.height, btnSaveSrc);  
+  PImage btnSaveOverSrc = loadImage("btn-save-over.png");
   PImage btnTrashSrc = loadImage("btn-trash.png");
-  btnTrash = new ImageButtons(60, 480, btnTrashSrc.width, btnTrashSrc.height, btnTrashSrc);  
+  PImage btnTrashOverSrc = loadImage("btn-trash-over.png");
+  
+  btnDraw = new ImageButtons(0, 480, btnDrawSrc.width, btnDrawSrc.height, btnDrawSrc, btnDrawOverSrc);
+  btnSave = new ImageButtons(30, 480, btnSaveSrc.width, btnSaveSrc.height, btnSaveSrc, btnSaveOverSrc);  
+  btnTrash = new ImageButtons(60, 480, btnTrashSrc.width, btnTrashSrc.height, btnTrashSrc, btnTrashOverSrc);  
   
   colorsX = 119;  
   colorsY = captureH+2;
@@ -101,7 +101,7 @@ void keyPressed() {
   
   // Save Key
   if (key == 's') {    
-    saveImage();
+    saveDrawing();
   }
   
   // Trash Key
@@ -115,58 +115,58 @@ void keyPressed() {
 /* Mouse UI
 ------------------------------------------------------------ */
 
-void mousePressed() {
-  
-  int uiButtonsYMin = uiY+uiButtonOffsetY;
-  int uiButtonsYMax = uiY+uiButtonOffsetY+25; // Buttons are 25x25.
-  
-//  if (mode == "pose") {
-//    // Draw Button
-//    if (mouseX >= 148 && mouseX <= 173 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-//      image(myCapture, 0, 0);
-//      newbeard = false;    
-//      mode = "draw";
+//void mousePressed() {
+//  
+////  int uiButtonsYMin = uiY+uiButtonOffsetY;
+////  int uiButtonsYMax = uiY+uiButtonOffsetY+25; // Buttons are 25x25.
+//  
+////  if (mode == "pose") {
+////    // Draw Button
+////    if (mouseX >= 148 && mouseX <= 173 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+////      image(myCapture, 0, 0);
+////      newbeard = false;    
+////      mode = "draw";
+////    }
+////  } 
+//  
+//  if (mode == "draw") {
+//    // Save Button
+////    if (mouseX >= 82 && mouseX <= 107 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+////      saveImage();  
+////    }  
+//    // Trash Button
+////    if (mouseX >= 213 && mouseX <= 238 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
+////      newbeard = true;
+////      mode = "pose";
+////    }
+//    // Colors    
+//    // Black
+//    if (mouseX >= colorsX+colorBlockOffsetX && mouseX <= colorsX+colorBlockOffsetX+colorBlock && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
+//      cCurrent = cBlack; 
+//      cCurrentX = 127;
 //    }
-//  } 
-  
-  if (mode == "draw") {
-    // Save Button
-//    if (mouseX >= 82 && mouseX <= 107 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-//      saveImage();  
+//    // White
+//    if (mouseX >= colorsX+colorBlockOffsetX+colorBlock && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*2) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
+//      cCurrent = cWhite; 
+//      cCurrentX = 141;
+//    }
+//    // Blonde
+//    if (mouseX >= colorsX+colorBlockOffsetX+(colorBlock*2) && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*3) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
+//      cCurrent = cBlonde; 
+//      cCurrentX = 155;
 //    }  
-    // Trash Button
-//    if (mouseX >= 213 && mouseX <= 238 && mouseY >= uiButtonsYMin && mouseY <= uiButtonsYMax) {
-//      newbeard = true;
-//      mode = "pose";
-//    }
-    // Colors    
-    // Black
-    if (mouseX >= colorsX+colorBlockOffsetX && mouseX <= colorsX+colorBlockOffsetX+colorBlock && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
-      cCurrent = cBlack; 
-      cCurrentX = 127;
-    }
-    // White
-    if (mouseX >= colorsX+colorBlockOffsetX+colorBlock && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*2) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
-      cCurrent = cWhite; 
-      cCurrentX = 141;
-    }
-    // Blonde
-    if (mouseX >= colorsX+colorBlockOffsetX+(colorBlock*2) && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*3) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
-      cCurrent = cBlonde; 
-      cCurrentX = 155;
-    }  
-    // Brown
-    if (mouseX >= colorsX+colorBlockOffsetX+(colorBlock*3) && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*4) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
-      cCurrent = cBrown;
-      cCurrentX = 169; 
-    }    
-    // Red
-    if (mouseX >= colorsX+colorBlockOffsetX+(colorBlock*4) && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*5) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
-      cCurrent = cRed;
-      cCurrentX = 183; 
-    }    
-  } 
-}
+//    // Brown
+//    if (mouseX >= colorsX+colorBlockOffsetX+(colorBlock*3) && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*4) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
+//      cCurrent = cBrown;
+//      cCurrentX = 169; 
+//    }    
+//    // Red
+//    if (mouseX >= colorsX+colorBlockOffsetX+(colorBlock*4) && mouseX <= colorsX+colorBlockOffsetX+(colorBlock*5) && mouseY >= colorsY+colorBlockOffsetY && mouseY <= colorsY+colorBlockOffsetY+colorBlock) {
+//      cCurrent = cRed;
+//      cCurrentX = 183; 
+//    }    
+//  } 
+//}
 
 /* Draw
 ------------------------------------------------------------ */
@@ -211,79 +211,79 @@ void draw() {
   // UI
   renderUIBackground();
   
-  update(mouseX, mouseY);
-
-  if (mode == "pose") {
-    
-    // Show Draw Button
-    btnDraw.update();
-    btnDraw.display(); 
-    
+  
+  if (btnDraw.pressed) {
+    newDrawing();
   }
   
-  if (mode == "draw") {
+  if (btnSave.pressed) {
+    saveDrawing();
+  }
+  
+  if (btnTrash.pressed) {
+    trashDrawing();
+  }
     
-    // Show Save Button
-    //renderUIButton("btn-save.png", 82, 489); //offset +9 vertical
-    btnSave.update();
-    btnSave.display();
+//  if (mode == "pose") {
     
-    // Show Delete Button
-    //renderUIButton("btn-trash.png", 213, 489); //offset +9 vertical
-    btnTrash.update();
-    btnTrash.display();
+  // Show Draw Button
+  btnDraw.update();
+  btnDraw.display(); 
+    
+//  }
+//  
+//  if (mode == "draw") {
+    
+  // Show Save Button
+  btnSave.update();
+  btnSave.display();
+    
+  // Show Delete Button
+  btnTrash.update();
+  btnTrash.display();
   
     // Color Buttons
     // Button Background
-    noStroke();
-    fill(59, 51, 41); 
-    rect(colorsX, colorsY, 82, 32);
+//    noStroke();
+//    fill(59, 51, 41); 
+//    rect(colorsX, colorsY, 82, 32);
     
     // Current Color Selection
-    fill(72, 63, 51);
-    triangle(cCurrentX, cCurrentY, cCurrentX+5, 268, cCurrentX+10, 275);
+//    fill(72, 63, 51);
+//    triangle(cCurrentX, cCurrentY, cCurrentX+5, 268, cCurrentX+10, 275);
 
     // Make Color Buttons
-    for (int i = 0; i < colors.length; i++) {
-       fill(colors[i]);
-       rect(colorsX+colorBlockOffsetX+(colorBlock*i), colorsY+colorBlockOffsetY, colorBlock, colorBlock);
-    }
+//    for (int i = 0; i < colors.length; i++) {
+//       fill(colors[i]);
+//       rect(colorsX+colorBlockOffsetX+(colorBlock*i), colorsY+colorBlockOffsetY, colorBlock, colorBlock);
+//    }
     
-  }
+//  }
   
+  //update(mouseX, mouseY);
   
   
  
 }
 
 
-void update(int x, int y) {
-  if (mousePressed) {
-    
-    if (btnDraw.pressed && mode == "pose") {
-      newDrawing();
-    }
-
-    if (btnSave.pressed && mode == "draw") {
-      saveImage();
-    }
-    
-    if (btnTrash.pressed && mode == "draw") {
-      trashDrawing();
-    }
-  }
-}
-
-void newDrawing() {
-  image(myCapture, 0, 0);
-  newbeard = false;
-  mode = "draw";
-}
-
-void trashDrawing() {
-  newbeard = true;
-  mode = "pose";
-}  
+//void update(int x, int y) {
+//  if (mousePressed) {
+//    
+//    if (btnDraw.pressed && (mode == "pose")) {
+//      newDrawing();
+//    }
+//
+//    if (btnSave.pressed && mode == "draw") {
+//      saveDrawing();
+//    }
+//    
+//    if (btnTrash.pressed && mode == "draw") {
+//      trashDrawing();
+//    }
+//  }
+//}
+ 
 
 /* Classes
 ------------------------------------------------------------ */
@@ -317,19 +317,18 @@ class Button
 class ImageButtons extends Button 
 {
   PImage base;
-  //PImage roll;
+  PImage roll;
   //PImage down;
   PImage currentimage;
 
-  ImageButtons(int ix, int iy, int iw, int ih, PImage ibase) //  PImage iroll, PImage idown
+  ImageButtons(int ix, int iy, int iw, int ih, PImage ibase, PImage iroll)
   {
     x = ix;
     y = iy;
     w = iw;
     h = ih;
     base = ibase;
-    //roll = iroll;
-    //down = idown;
+    roll = iroll;
     currentimage = base;
   }
   
@@ -337,16 +336,11 @@ class ImageButtons extends Button
   {
     over();
     pressed();
-    /*
-    if(pressed) {
-      //currentimage = down;
-    } else if (over){
-      //currentimage = roll;
+    if (over) {
+      currentimage = roll;
     } else {
-    */
       currentimage = base;
-    /*
-    }*/
+    }
   }
   
   void over() 
@@ -372,18 +366,24 @@ class ImageButtons extends Button
 void renderUIBackground() {
   noStroke();
   fill(72, 63, 51); // BG
-  rect(uiX, uiY, uiW, uiH);
+  rect(0, 480, 650, 44);
 }
 
-// Render a UI button
-//void renderUIButton(String btnFile, int btnX, int btnY) {
-//  PImage btnNew; 
-//  btnNew = loadImage(btnFile);
-//  image(btnNew, btnX, btnY);
-//}
+// Create a new drawing
+void newDrawing() {
+  image(myCapture, 0, 0);
+  newbeard = false;
+  mode = "draw";
+}
 
-// Save an image
-void saveImage() {
+// Trash the drawing and start over
+void trashDrawing() {
+  newbeard = true;
+  mode = "pose";
+} 
+
+// Save a drawing
+void saveDrawing() {
   PImage sImage;
   sImage = get(0, 0, captureW, captureH);
   sImage.save("beard-" + timestamp() + ".png");  
