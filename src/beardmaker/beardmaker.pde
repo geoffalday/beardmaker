@@ -101,13 +101,13 @@ void draw() {
   
   if (mousePressed == true) {
     
-    if (mouseX>=width/2) {
+    if (mouseX>=captureW/2) {
       xVector = random(hLength);
     } else {
       xVector = -random(hLength); 
     }
     
-    if (mouseY>=240/2) {
+    if (mouseY>=captureH/2) {
       yVector = random(hLength);
     } else {
       yVector = -random(hLength);
